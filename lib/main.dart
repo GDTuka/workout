@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -31,17 +33,45 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   int _counter = 0;
+  int _timerSeconds = 0; // Timer value in seconds
+  Timer? _timer; // Timer instance
+
+  void _startTimer() {
+    _timerSeconds = 0; // Reset timer
+    _timer?.cancel(); // Cancel any existing timer
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        _timerSeconds++;
+      });
+    });
+  }
+
+  void _stopTimer() {
+    setState(() {
+      _timer?.cancel();
+      _timerSeconds = 0;
+    });
+  }
 
   void _incrementCounter() {
     setState(() {
       _counter++;
     });
+    _startTimer(); // Start timer on button press
   }
 
   void _clearCounter() {
     setState(() {
       _counter = 0;
     });
+    _stopTimer(); // Stop timer on button press
+  }
+
+  String formatTime(int totalSeconds) {
+    int minutes = totalSeconds ~/ 60; // Divides and gets the integer result
+    int seconds = totalSeconds % 60; // Gets the remainder
+    // Formats the minutes and seconds, ensuring they are always two digits
+    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
 
   @override
@@ -74,11 +104,27 @@ class _HomeState extends State<Home> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: Center(
-        child: Text(
-          'Подходов: $_counter',
-          style: const TextStyle(fontSize: 30),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Подходов: $_counter',
+              style: const TextStyle(fontSize: 30),
+            ),
+            const SizedBox(height: 20), // Add space between texts
+            Text(
+              formatTime(_timerSeconds),
+              style: const TextStyle(fontSize: 20),
+            ),
+          ],
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel(); // Always cancel the timer to avoid memory leaks
+    super.dispose();
   }
 }
