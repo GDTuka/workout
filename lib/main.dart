@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 void main() {
   runApp(const MyApp());
@@ -34,14 +33,16 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   int _counter = 0;
   int _timerSeconds = 0; // Timer value in seconds
+  DateTime? _timerStartTime;
   Timer? _timer; // Timer instance
 
   void _startTimer() {
     _timerSeconds = 0; // Reset timer
+    _timerStartTime = DateTime.now();
     _timer?.cancel(); // Cancel any existing timer
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
-        _timerSeconds++;
+        _timerSeconds = DateTime.now().difference(_timerStartTime!).inSeconds;
       });
     });
   }
@@ -49,6 +50,7 @@ class _HomeState extends State<Home> {
   void _stopTimer() {
     setState(() {
       _timer?.cancel();
+      _timerStartTime = null;
       _timerSeconds = 0;
     });
   }
@@ -103,21 +105,35 @@ class _HomeState extends State<Home> {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Подходов: $_counter',
-              style: const TextStyle(fontSize: 30),
+      body: Stack(
+        children: [
+          Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Подходов: $_counter',
+                  style: const TextStyle(fontSize: 30),
+                ),
+                const SizedBox(height: 20), // Add space between texts
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "Время: ",
+                      style: TextStyle(fontSize: 40),
+                    ),
+                    Text(
+                      formatTime(_timerSeconds),
+                      style: const TextStyle(fontSize: 40, fontFamily: 'monospace'),
+                    ),
+                  ],
+                ),
+              ],
             ),
-            const SizedBox(height: 20), // Add space between texts
-            Text(
-              formatTime(_timerSeconds),
-              style: const TextStyle(fontSize: 20),
-            ),
-          ],
-        ),
+          ),
+          const Text("Made by: GDTuka")
+        ],
       ),
     );
   }
