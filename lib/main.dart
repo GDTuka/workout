@@ -120,7 +120,7 @@ class _HomeState extends State<Home> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
-                      "Время: ",
+                      "Прошло с подхода: ",
                       style: TextStyle(fontSize: 40),
                     ),
                     Text(
